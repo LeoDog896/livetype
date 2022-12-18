@@ -1,11 +1,17 @@
 <script lang="ts">
     import { io } from "$lib/realtime";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
 
     let textfield = ""
     let username = ""
 
-    let messages = []
+    interface Message {
+        from: string
+        message: string
+        time: string
+    }
+
+    let messages: Message[] = []
 
     onMount(() => {
         io.on("message", message => { // Listen to the message event
@@ -21,8 +27,12 @@
         if(!message) return
 
         textfield = ""
-        io.emit("message", message) // Send the message
+        io?.emit("message", message) // Send the message
     }
+
+    onDestroy(() => {
+        io?.close()
+    })
 </script>
 
 <div class="h-screen w-screen bg-zinc-800">
